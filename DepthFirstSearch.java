@@ -1,32 +1,25 @@
 import java.util.*;
 
-class BreadthFirstSearch<T> implements Search <T> {
+class DepthFirstSearch<T> implements Search<T> {
     private final Map<T, T> edgeTo;
     private final Set<T> marked;
     private final T start;
 
-    public BreadthFirstSearch(MyGraph<T> graph, T start) {
+    public DepthFirstSearch(MyGraph<T> graph, T start) {
         this.edgeTo = new HashMap<>();
         this.marked = new HashSet<>();
         this.start = start;
-        bfs(graph, start);
+        dfs(graph, start);
     }
 
-    private void bfs(MyGraph<T> graph, T start) {
-        Queue<T> queue = new LinkedList<>();
-        marked.add(start);
-        queue.add(start);
-
-        while (!queue.isEmpty()) {
-            T v = queue.poll();
-            Vertex<T> vertex = graph.getVertex(v);
-            for (Edge<T> edge : vertex.getAdjacents()) {
-                T w = edge.getVertex().getValue();
-                if (!marked.contains(w)) {
-                    edgeTo.put(w, v);
-                    marked.add(w);
-                    queue.add(w);
-                }
+    private void dfs(MyGraph<T> graph, T v) {
+        marked.add(v);
+        Vertex<T> vertex = graph.getVertex(v);
+        for (Edge<T> edge : vertex.getAdjacents()) {
+            T w = edge.getVertex().getValue();
+            if (!marked.contains(w)) {
+                edgeTo.put(w, v);
+                dfs(graph, w);
             }
         }
     }

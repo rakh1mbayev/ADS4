@@ -1,27 +1,36 @@
-class WeightedGraph<T> extends MyGraph<T> {
+import java.util.*;
+
+public class WeightedGraph<V> {
+    private Map<V, Vertex<V>> vertices;
+    private boolean directed;
 
     public WeightedGraph(boolean directed) {
-        super(directed);
+        this.directed = directed;
+        this.vertices = new HashMap<>();
     }
 
-    public void addEdge(T from, T to, double weight) {
-        Vertex<T> v = getVertex(from);
-        if (v == null) {
-            v = new Vertex<>(from);
-            addVertex(v);
-        }
-        Vertex<T> w = getVertex(to);
-        if (w == null) {
-            w = new Vertex<>(to);
-            addVertex(w);
-        }
-        v.addAdjacent(w, weight);
-        if (!directed) {
-            w.addAdjacent(v, weight);
+    public void addVertex(V data) {
+        if (!vertices.containsKey(data)) {
+            vertices.put(data, new Vertex<>(data));
         }
     }
 
-    private void addVertex(Vertex<T> vertex) {
-        vertices.put(vertex.getValue(), vertex);
+    public void addEdge(V sourceData, V destData, double weight) {
+        addVertex(sourceData);
+        addVertex(destData);
+        Vertex<V> source = vertices.get(sourceData);
+        Vertex<V> dest = vertices.get(destData);
+        source.addAdjacentVertex(dest, weight);
+        if (!directed) { 
+            dest.addAdjacentVertex(source, weight);
+        }
+    }
+
+    public Vertex<V> getVertex(V data) {
+        return vertices.get(data);
+    }
+
+    public Collection<Vertex<V>> getAllVertices() {
+        return vertices.values();
     }
 }

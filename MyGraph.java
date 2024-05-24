@@ -1,30 +1,68 @@
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
-class MyGraph<T> {
-    public final Map<T, Vertex<T>> vertices;
-    public final boolean directed;
+public class MyGraph<V> {
+    private final boolean undirected;
+    private final Map<V, List<V>> map = new HashMap<>();
 
-    public MyGraph(boolean directed) {
-        this.directed = directed;
-        this.vertices = new HashMap<>();
+    public MyGraph() {
+        this(true);
     }
 
-    public void addEdge(T from, T to) {
-        Vertex<T> v = vertices.computeIfAbsent(from, Vertex::new);
-        Vertex<T> w = vertices.computeIfAbsent(to, Vertex::new);
-        v.addAdjacent(w);
-        if (!directed) {
-            w.addAdjacent(v);
+    public MyGraph(boolean undirected) {
+        this.undirected = undirected;
+    }
+
+    public void addVertex(V v) {
+        if (hasVertex(v))
+            return;
+
+        map.put(v, new LinkedList<>());
+    }
+
+    public void addEdge(V source, V dest) {
+        if (!hasVertex(source))
+            addVertex(source);
+
+        if (!hasVertex(dest))
+            addVertex(dest);
+
+        if (hasEdge(source, dest) || source.equals(dest))
+            return; // reject parallels & self-loops
+
+        map.get(source).add(dest);
+
+        if (undirected)
+            map.get(dest).add(source);
+    }
+
+    public int getVerticesCount() {
+        return map.size();
+    }
+
+    public int getEdgesCount() {
+        int count = 0;
+        for (V v : map.keySet()) {
+            count += map.get(v).size();
         }
+
+        if (undirected)
+            count /= 2;
+
+        return count;
     }
 
-    public Vertex<T> getVertex(T value) {
-        return vertices.get(value);
+    public boolean hasVertex(V v) {
+        return map.containsKey(v);
     }
 
-    public Collection<Vertex<T>> getVertices() {
-        return vertices.values();
+    public boolean hasEdge(V source, V dest) {
+        if (!hasVertex(source)) return false;
+        return map.get(source).contains(dest);
+    }
+
+    public List<V> adjacencyList(V v) {
+        if (!hasVertex(v)) return null;
+
+        return map.get(v);
     }
 }
